@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+        }
+        .calculator {
+            background: #2c3e50;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            width: 320px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .display {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            text-align: right;
+            font-size: 2em;
+            color: #2c3e50;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            min-height: 60px;
+            
+        }
+        .history {
+            font-size: 0.7em;
+            color: #7f8c8d;
+            position: absolute;
+            top: 5px;
+            margin-top: 0;
+            right: 15px;
+            transition: all 0.3s ease;
+        }
+        .current-input {
+            word-wrap: break-word;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        button {
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 8px;
+            background: #34495e;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background: #4a6a8a;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .operator {
+            background: #e67e22;
+        }
+        .operator:hover {
+            background: #f39c12;
+        }
+        .equals {
+            background: #27ae60;
+        }
+        .equals:hover {
+            background: #2ecc71;
+        }
+        .clear {
+            background: #c0392b;
+        }
+        .clear:hover {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="history" id="history"></div>
+            <div class="current-input" id="currentInput">0</div>
+        </div>
+        <div class="buttons">
+            <button onclick="clearAll()">C</button>
+            <button class="operator" onclick="addOperator('/')">÷</button>
+            <button class="operator" onclick="addOperator('*')">×</button>
+            <button class="operator" onclick="addOperator('-')">-</button>
+            
+            <button onclick="addNumber('7')">7</button>
+            <button onclick="addNumber('8')">8</button>
+            <button onclick="addNumber('9')">9</button>
+            <button class="operator" onclick="addOperator('+')">+</button>
+            
+            <button onclick="addNumber('4')">4</button>
+            <button onclick="addNumber('5')">5</button>
+            <button onclick="addNumber('6')">6</button>
+            <button onclick="addNumber('.')">.</button>
+            
+            <button onclick="addNumber('1')">1</button>
+            <button onclick="addNumber('2')">2</button>
+            <button onclick="addNumber('3')">3</button>
+            <button onclick="addNumber('0')">0</button>
+            
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = '';
+        let history = '';
+        const display = document.getElementById('currentInput');
+        const historyDisplay = document.getElementById('history');
+
+        function addNumber(num) {
+            currentInput += num;
+            updateDisplay();
+        }
+
+        function addOperator(op) {
+            if (currentInput !== '' && !/[+\-×÷]/.test(currentInput.slice(-1))) {
+                currentInput += op;
+                updateDisplay();
+            }
+        }
+
+        function updateDisplay() {
+            display.textContent = currentInput || '0';
+        }
+
+        function calculate() {
+            try {
+                // Replace × and ÷ with * and / for evaluation
+                let expression = currentInput
+                    .replace('×', '*')
+                    .replace('÷', '/');
+                
+                // Move current calculation to history
+                history = currentInput;
+                historyDisplay.textContent = history;
+                
+                // Calculate result
+                let result = eval(expression);
+                
+                // Format result to handle floating points
+                result = Number.isInteger(result) ? result : result.toFixed(2);
+                
+                // Update display with result
+                currentInput = result.toString();
+                updateDisplay();
+            } catch (error) {
+                display.textContent = 'Error';
+                currentInput = '';
+            }
+        }
+
+        function clearAll() {
+            currentInput = '';
+            history = '';
+            display.textContent = '0';
+            historyDisplay.textContent = '';
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (/[0-9]/.test(e.key)) addNumber(e.key);
+            if (e.key === '.') addNumber('.');
+            if (e.key === '+') addOperator('+');
+            if (e.key === '-') addOperator('-');
+            if (e.key === '*') addOperator('×');
+            if (e.key === '/') addOperator('÷');
+            if (e.key === 'Enter') calculate();
+            if (e.key === 'Escape') clearAll();
+        });
+    </script>
+</body>
+</html>
